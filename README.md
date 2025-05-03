@@ -1,0 +1,1 @@
+This is example of creating the azure vm via Terraform module
