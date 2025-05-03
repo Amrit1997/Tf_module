@@ -20,9 +20,8 @@ variable "admin_username" {
 
 }
 
-variable "admin_ssh_key" {
+variable "admin_ssh_public_key" {
   type = string
-
 }
 
 variable "tags" {
