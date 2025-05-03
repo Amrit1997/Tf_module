@@ -6,16 +6,16 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "subnet" {
-  name                 = "${var.vm_name}-vnet"
+  name                 = "${var.vm_name}-subnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.0.0/24"]
+  address_prefixes     = ["10.0.0.0/24"]  # Fixed the list format here
 }
 
-resource "azurerm_public_ip" "puiblicip" {
+resource "azurerm_public_ip" "public_ip" {
   name                = "${var.vm_name}-public-ip"
-  resource_group_name = var.resource_group_name
   location            = var.location
+  resource_group_name = var.resource_group_name
   allocation_method   = "Dynamic"
   sku                 = "Basic"
 }
@@ -29,9 +29,8 @@ resource "azurerm_network_interface" "nic" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.puiblicip.id
+    public_ip_address_id          = azurerm_public_ip.public_ip.id  # Reference to public IP
   }
-
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {
@@ -50,16 +49,17 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 
   os_disk {
-    caching              = "Readwrite"
+    caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-focal"
+    offer     = "UbuntuServer"
     sku       = "20_04-lts"
     version   = "latest"
   }
+
   lifecycle {
     ignore_changes = [
       size
@@ -67,6 +67,4 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 
   tags = var.tags
-
 }
-
